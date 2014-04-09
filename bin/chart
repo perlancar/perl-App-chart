@@ -1,0 +1,205 @@
+#!/usr/bin/perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::chart;
+use Getopt::Long;
+
+# VERSION
+
+my %Opts = (
+    input       => 'json',
+    output      => 'text',
+    type        => 'bar',
+    data_field  => undef,
+    label_field => undef,
+    y_scale     => 'linear',
+);
+my $Data;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'input|i=s'       => \$Opts{input},
+        'output|o=s'      => \$Opts{output},
+        'type|t=s'        => \$Opts{type},
+        'data-field|d=s'  => \$Opts{data_field},
+        'label-field|l=s' => \$Opts{label_field},
+        'y-scale=s'       => \$Opts{y_scale},
+        'version|v'  => sub {
+            say "chart version ", ($main::VERSION // '?');
+            exit 0;
+        },
+        'help|h'     => sub {
+            print <<USAGE;
+Usage:
+  chart [OPTIONS] < INPUT
+  chart --version
+  chart --help
+Examples:
+  chart -o YAML data.json
+Options:
+  --input=s, -i        Input data format (json, yaml, perl; default is json).
+  --output=s, -o       Output format (text).
+  --type=s, -t         Choose chart type.
+  --data-field=s, -d
+  --label-field=s, -l
+Consult manpage/documentation for more details.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub get_input {
+    local $/;
+    if ($Opts{input} eq 'json') {
+        require JSON;
+        $Data = JSON->new->allow_nonref->decode(~~<>);
+    } elsif ($Opts{input} eq 'yaml') {
+        require YAML::Syck;
+        $Data = YAML::Syck::Load(~~<>);
+    } elsif ($Opts{input} eq 'perl') {
+        $Data = eval(~~<>);
+    } else {
+        warn "Unknown input format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    }
+}
+
+sub gen_chart {
+    my $res = App::chart->new->gen_chart(
+        data        => $Data,
+        output      => $Opts{output},
+        type        => $Opts{type},
+        label_field => $Opts{label_field},
+        data_field  => $Opts{data_field},
+        y_scale     => $Opts{y_scale},
+    );
+    if ($res->[0] != 200) {
+        say "chart: $res->[1]";
+        exit($res->[0] == 400 ? 99 : 1);
+    }
+    print $res->[2];
+}
+
+# MAIN
+
+parse_cmdline();
+get_input();
+gen_chart();
+
+1;
+# ABSTRACT: Create chart for your data structure
+# PODNAME: chart
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % chart [OPTIONS] < INPUT
+
+Examples:
+
+ % cat celine-dion-album-sales.json
+ [
+   {
+     "lang": "en",
+     "sales": 3000000,
+     "title": "unison",
+     "year": 1990
+   },
+   {
+     "lang": "en",
+     "sales": 5300000,
+     "title": "celine dion",
+     "year": 1992
+   },
+   {
+     "lang": "en",
+     "sales": 16600000,
+     "title": "the color of my love",
+     "year": 1993
+   },
+   ...
+ ]
+
+ % chart -l year -d sales celine-dion-album-sales.json
+ 1990 :**                                             (3000000)
+ 1992 :******                                         (5300000)
+ 1993 :**********************                         (16600000)
+ 1996 :******************************************     (30300000)
+ 1997 :*********************************************  (32100000)
+ 1998 :****************                               (12100000)
+ 2002 :*************                                  (10500000)
+ 2003 :******                                         (5100000)
+ 2004 :**                                             (2600000)
+ 2007 :***                                            (3400000)
+ 2013 :                                               (1300000)
+
+
+=head1 DESCRIPTION
+
+This program creates a chart for your data structure, either in the form of an
+array, array of arrays, hash, array of hashes. You can use it to quickly
+visualize a data structure on a console.
+
+It accepts input as JSON, or several other alternative formats (see the C<-i>
+option). It by default outputs the chart as ASCII text. Other formats will be
+supported in the future.
+
+This is an early release. More options, chart types, will be added in the
+future.
+
+
+=head1 OPTIONS
+
+=over
+
+=item * --input=STR, -i
+
+Pick input format. Available formats: C<json> (parsed using L<JSON>), C<yaml>
+(parsed using L<YAML::Syck>), C<perl> (eval-ed by B<perl>). Default is C<json>.
+
+=item * --output=STR, -o
+
+Pick output chart format. Available formats: text. Default is text.
+
+=item * --data-field, -d
+
+=item * --label-field, -l
+
+=item * --type, -t
+
+Pick chart type. Available type: C<line>, C<bar>. Default is C<bar>.
+
+=back
+
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+
+=head1 TODO
+
+Autodetect input format.
+
+Option: use boxchar and Unicode characters.
+
+Option: color.
+
+Option: width.
+
+
+=head1 FAQ
+
+
+=head1 SEE ALSO
+
+=cut
