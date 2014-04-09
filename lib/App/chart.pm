@@ -118,6 +118,8 @@ sub gen_chart {
 1;
 # ABSTRACT: Create chart for your data structure
 
+=for Pod::Coverage ^(gen_chart)$
+
 =head1 SYNOPSIS
 
 See the command-line script L<chart>.
