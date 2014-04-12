@@ -190,7 +190,8 @@ Pick chart type. Available type: C<line>, C<bar>. Default is C<bar>.
 
 Autodetect input format.
 
-Option: use boxchar and Unicode characters.
+Option: use boxchar and Unicode characters. See also: L<Term::Spark>,
+L<Term::Vspark>.
 
 Option: color.
 
