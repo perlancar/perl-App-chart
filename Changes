@@ -1,5 +1,10 @@
 Revision history for App-chart
 
+0.02    2014-04-17 (SHARYANTO)
+
+        - Detect enveloped result (see Rinci::function) and adjust accordingly.
+
+
 0.01    2014-04-10 (SHARYANTO)
 
         - First release.

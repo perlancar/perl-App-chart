@@ -11,6 +11,7 @@ use Moo;
 with 'SHARYANTO::Role::TermAttrs';
 
 # VERSION
+# DATE
 
 sub gen_chart {
     my ($self, %args) = @_;
