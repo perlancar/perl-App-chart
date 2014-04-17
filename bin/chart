@@ -57,10 +57,14 @@ sub get_input {
     local $/;
     if ($Opts{input} eq 'json') {
         require JSON;
+        require Perinci::Result::Util;
         $Data = JSON->new->allow_nonref->decode(~~<>);
+        $Data = $Data->[2] if Perinci::Result::Util::is_env_res($Data);
     } elsif ($Opts{input} eq 'yaml') {
+        require Perinci::Result::Util;
         require YAML::Syck;
         $Data = YAML::Syck::Load(~~<>);
+        $Data = $Data->[2] if Perinci::Result::Util::is_env_res($Data);
     } elsif ($Opts{input} eq 'perl') {
         $Data = eval(~~<>);
     } else {
