@@ -76,7 +76,7 @@ sub get_input {
         $Data = [];
         for my $line (@lines) {
             chomp $line;
-            push @$Data, split(/\t/, $line);
+            push @$Data, [split(/\t/, $line)];
         }
     } elsif ($fmt eq 'tsv+h') {
         # for now, we encode as
