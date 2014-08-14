@@ -30,8 +30,8 @@ sub parse_cmdline {
         'type|t=s'         => \$Opts{type},
         'data-column|d=s'  => \$Opts{data_column},
         'label-column|l=s' => \$Opts{label_column},
-        'chart-height|h=s' => \$Opts{chart_height},
-        'chart-width|w=s'  => \$Opts{chart_width},
+        'chart-height|H=f' => \$Opts{chart_height},
+        'chart-width|W=f'  => \$Opts{chart_width},
         'y-scale=s'        => \$Opts{y_scale},
         'version|v'        => sub {
             say "chart version ", ($main::VERSION // '?');
@@ -51,6 +51,8 @@ Options:
   --type=s, -t         Choose chart type.
   --data-column=s, -d
   --label-column=s, -l
+  --chart-height=f, -H
+  --chart-width=f, -W
 Consult manpage/documentation for more details.
 USAGE
             exit 0;
