@@ -111,16 +111,22 @@ sub get_input {
 }
 
 sub display_chart {
-    require Text::Chart;
-
-    binmode(STDOUT, ":utf8");
-    print Text::Chart::gen_text_chart(
-        data         => $Data,
-        type         => $Opts{type},
-        label_column => $Opts{label_column},
-        data_column  => $Opts{data_column},
-        #y_scale      => $Opts{y_scale},
-    );
+    if ($Opts{output} eq 'dump') {
+        require JSON;
+        require TableData::Object;
+        my $tbl = TableData::Object->new($Data);
+        print JSON->new->pretty->encode($tbl->as_aohos);
+    } else {
+        require Text::Chart;
+        binmode(STDOUT, ":utf8");
+        print Text::Chart::gen_text_chart(
+            data         => $Data,
+            type         => $Opts{type},
+            label_column => $Opts{label_column},
+            data_column  => $Opts{data_column},
+            #y_scale      => $Opts{y_scale},
+        );
+    }
 }
 
 # MAIN
@@ -210,7 +216,7 @@ Default is detected using simple heuristics.
 
 =item * --output=STR, -o
 
-Pick output chart format. Available formats: text. Default is text.
+Pick output chart format. Available formats: text, dump. Default is text.
 
 =item * --data-column, -d
 
