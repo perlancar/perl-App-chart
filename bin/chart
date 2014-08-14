@@ -17,6 +17,8 @@ my %Opts = (
     type         => 'bar',
     data_column  => undef,
     label_column => undef,
+    chart_height => undef,
+    chart_width  => undef,
     y_scale      => 'linear',
 );
 my $Data;
@@ -28,6 +30,8 @@ sub parse_cmdline {
         'type|t=s'         => \$Opts{type},
         'data-column|d=s'  => \$Opts{data_column},
         'label-column|l=s' => \$Opts{label_column},
+        'chart-height|h=s' => \$Opts{chart_height},
+        'chart-width|w=s'  => \$Opts{chart_width},
         'y-scale=s'        => \$Opts{y_scale},
         'version|v'        => sub {
             say "chart version ", ($main::VERSION // '?');
@@ -124,6 +128,8 @@ sub display_chart {
             type         => $Opts{type},
             label_column => $Opts{label_column},
             data_column  => $Opts{data_column},
+            chart_height => $Opts{chart_height},
+            chart_width  => $Opts{chart_width},
             #y_scale      => $Opts{y_scale},
         );
     }
