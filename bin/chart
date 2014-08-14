@@ -1,34 +1,35 @@
 #!perl
 
+# VERSION
+# DATE
+
 use 5.010001;
 use strict;
 use warnings;
 
-use App::chart;
+#use App::chart;
 use Getopt::Long;
-
-# VERSION
-# DATE
+use Scalar::Util qw(looks_like_number);
 
 my %Opts = (
-    input       => 'json',
-    output      => 'text',
-    type        => 'bar',
-    data_field  => undef,
-    label_field => undef,
-    y_scale     => 'linear',
+    input        => undef,
+    output       => 'text',
+    type         => 'bar',
+    data_column  => undef,
+    label_column => undef,
+    y_scale      => 'linear',
 );
 my $Data;
 
 sub parse_cmdline {
     my $res = GetOptions(
-        'input|i=s'       => \$Opts{input},
-        'output|o=s'      => \$Opts{output},
-        'type|t=s'        => \$Opts{type},
-        'data-field|d=s'  => \$Opts{data_field},
-        'label-field|l=s' => \$Opts{label_field},
-        'y-scale=s'       => \$Opts{y_scale},
-        'version|v'  => sub {
+        'input|i=s'        => \$Opts{input},
+        'output|o=s'       => \$Opts{output},
+        'type|t=s'         => \$Opts{type},
+        'data-column|d=s'  => \$Opts{data_column},
+        'label-column|l=s' => \$Opts{label_column},
+        'y-scale=s'        => \$Opts{y_scale},
+        'version|v'        => sub {
             say "chart version ", ($main::VERSION // '?');
             exit 0;
         },
@@ -44,8 +45,8 @@ Options:
   --input=s, -i        Input data format (json, yaml, perl; default is json).
   --output=s, -o       Output format (text).
   --type=s, -t         Choose chart type.
-  --data-field=s, -d
-  --label-field=s, -l
+  --data-column=s, -d
+  --label-column=s, -l
 Consult manpage/documentation for more details.
 USAGE
             exit 0;
@@ -55,19 +56,53 @@ USAGE
 }
 
 sub get_input {
-    local $/;
-    if ($Opts{input} eq 'json') {
+    if (@ARGV) {
+        $Data = [@ARGV];
+        return;
+    }
+
+    my @lines = <>;
+
+    my $fmt = $Opts{input};
+    if (!$fmt) {
+        if (looks_like_number($lines[0]) || $lines[0] =~ /\t/) {
+            $fmt = "tsv";
+        } else {
+            $fmt = "json";
+        }
+    }
+
+    if ($fmt eq 'tsv') {
+        $Data = [];
+        for my $line (@lines) {
+            chomp $line;
+            push @$Data, split(/\t/, $line);
+        }
+    } elsif ($fmt eq 'tsv+h') {
+        # for now, we encode as
+        my @colnames;
+        if (my $firstline = shift @lines) {
+            chomp $firstline;
+            @colnames = split /\t/, $firstline;
+        }
+        $Data = [];
+        for my $line (@lines) {
+            chomp $line;
+            my $row = [split /\t/, $line];
+            push @$Data, { map { $colnames[$_] => $row->[$_]} 0..@$row-1 };
+        }
+    } elsif ($fmt eq 'json') {
         require JSON;
         require Perinci::Result::Util;
-        $Data = JSON->new->allow_nonref->decode(~~<>);
+        $Data = JSON->new->allow_nonref->decode(join "", @lines);
         $Data = $Data->[2] if Perinci::Result::Util::is_env_res($Data);
-    } elsif ($Opts{input} eq 'yaml') {
+    } elsif ($fmt eq 'yaml') {
         require Perinci::Result::Util;
         require YAML::Syck;
-        $Data = YAML::Syck::Load(~~<>);
+        $Data = YAML::Syck::Load(join "", @lines);
         $Data = $Data->[2] if Perinci::Result::Util::is_env_res($Data);
-    } elsif ($Opts{input} eq 'perl') {
-        $Data = eval(~~<>);
+    } elsif ($fmt eq 'perl') {
+        $Data = eval(join "", @lines);
     } else {
         warn "Unknown input format, ".
             "refer to documentation for available formats\n";
@@ -75,27 +110,24 @@ sub get_input {
     }
 }
 
-sub gen_chart {
-    my $res = App::chart->new->gen_chart(
-        data        => $Data,
-        output      => $Opts{output},
-        type        => $Opts{type},
-        label_field => $Opts{label_field},
-        data_field  => $Opts{data_field},
-        y_scale     => $Opts{y_scale},
+sub display_chart {
+    require Text::Chart;
+
+    binmode(STDOUT, ":utf8");
+    print Text::Chart::gen_text_chart(
+        data         => $Data,
+        type         => $Opts{type},
+        label_column => $Opts{label_column},
+        data_column  => $Opts{data_column},
+        #y_scale      => $Opts{y_scale},
     );
-    if ($res->[0] != 200) {
-        say "chart: $res->[1]";
-        exit($res->[0] == 400 ? 99 : 1);
-    }
-    print $res->[2];
 }
 
 # MAIN
 
 parse_cmdline();
 get_input();
-gen_chart();
+display_chart();
 
 1;
 # ABSTRACT: Create chart for your data structure
@@ -105,11 +137,14 @@ gen_chart();
 
 Usage:
 
+ % chart [OPTIONS] NUMBER ...
  % chart [OPTIONS] < INPUT
 
 Examples:
 
- % echo '[1,5,10,2,4,6]' | chart
+ % echo '[1,5,10,2,4,6]' | chart -t sparkline
+
+ % chart -t sparkline 1 5 10 2 4 6
 
  % cat celine-dion-album-sales.json
  [
@@ -135,17 +170,17 @@ Examples:
  ]
 
  % chart -l year -d sales celine-dion-album-sales.json
- 1990 :**                                             (3000000)
- 1992 :******                                         (5300000)
- 1993 :**********************                         (16600000)
- 1996 :******************************************     (30300000)
- 1997 :*********************************************  (32100000)
- 1998 :****************                               (12100000)
- 2002 :*************                                  (10500000)
- 2003 :******                                         (5100000)
- 2004 :**                                             (2600000)
- 2007 :***                                            (3400000)
- 2013 :                                               (1300000)
+ 1990|**                                            ( 3000000)
+ 1992|******                                        ( 5300000)
+ 1993|**********************                        (16600000)
+ 1996|******************************************    (30300000)
+ 1997|********************************************* (32100000)
+ 1998|****************                              (12100000)
+ 2002|*************                                 (10500000)
+ 2003|******                                        ( 5100000)
+ 2004|**                                            ( 2600000)
+ 2007|***                                           ( 3400000)
+ 2013|                                              ( 1300000)
 
 
 =head1 DESCRIPTION
@@ -168,16 +203,18 @@ future.
 
 =item * --input=STR, -i
 
-Pick input format. Available formats: C<json> (parsed using L<JSON>), C<yaml>
-(parsed using L<YAML::Syck>), C<perl> (eval-ed by B<perl>). Default is C<json>.
+Pick input format. Available formats: C<tsv> (tab-separated, with no header
+line), C<tsv+h> (tab-separated, with header line), C<json> (parsed using
+L<JSON>), C<yaml> (parsed using L<YAML::Syck>), C<perl> (eval-ed by B<perl>).
+Default is detected using simple heuristics.
 
 =item * --output=STR, -o
 
 Pick output chart format. Available formats: text. Default is text.
 
-=item * --data-field, -d
+=item * --data-column, -d
 
-=item * --label-field, -l
+=item * --label-column, -l
 
 =item * --type, -t
 
@@ -190,24 +227,21 @@ Pick chart type. Available type: C<line>, C<bar>. Default is C<bar>.
 
 0 on success.
 
+1 on failure.
+
 99 on command-line options error.
 
 
 =head1 TODO
 
-Autodetect input format.
-
-Option: use boxchar and Unicode characters. See also: L<Term::Spark>,
-L<Term::Vspark>.
-
-Option: color.
-
-Option: width.
+Non-text (e.g. HTML, JPG/PNG) charts.
 
 
 =head1 FAQ
 
 
 =head1 SEE ALSO
+
+L<Text::Chart>
 
 =cut
