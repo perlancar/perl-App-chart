@@ -1,5 +1,8 @@
 package App::chart;
 
+# DATE
+# VERSION
+
 use 5.010;
 use strict;
 use warnings;
@@ -9,9 +12,6 @@ use Text::Graph::DataSet; # bug in Text::Graph, doesn't load this
 
 use Moo;
 with 'SHARYANTO::Role::TermAttrs';
-
-# VERSION
-# DATE
 
 sub gen_chart {
     my ($self, %args) = @_;

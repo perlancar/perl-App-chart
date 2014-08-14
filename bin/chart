@@ -109,6 +109,8 @@ Usage:
 
 Examples:
 
+ % echo '[1,5,10,2,4,6]' | chart
+
  % cat celine-dion-album-sales.json
  [
    {
