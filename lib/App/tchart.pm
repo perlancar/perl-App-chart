@@ -1,4 +1,4 @@
-package App::chart;
+package App::tchart;
 
 # DATE
 # VERSION
@@ -8,6 +8,6 @@ package App::chart;
 
 =head1 SYNOPSIS
 
-See the command-line script L<chart>.
+See the command-line script L<tchart>.
 
 =cut
