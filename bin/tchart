@@ -34,17 +34,17 @@ sub parse_cmdline {
         'chart-width|W=f'  => \$Opts{chart_width},
         'y-scale=s'        => \$Opts{y_scale},
         'version|v'        => sub {
-            say "chart version ", ($main::VERSION // '?');
+            say "tchart version ", ($main::VERSION // '?');
             exit 0;
         },
         'help|h'     => sub {
             print <<USAGE;
 Usage:
-  chart [OPTIONS] < INPUT
-  chart --version
-  chart --help
+  tchart [OPTIONS] < INPUT
+  tchart --version
+  tchart --help
 Examples:
-  chart -o YAML data.json
+  tchart -o YAML data.json
 Options:
   --input=s, -i        Input data format (json, yaml, perl; default is json).
   --output=s, -o       Output format (text).
@@ -151,14 +151,14 @@ display_chart();
 
 Usage:
 
- % chart [OPTIONS] NUMBER ...
- % chart [OPTIONS] < INPUT
+ % tchart [OPTIONS] NUMBER ...
+ % tchart [OPTIONS] < INPUT
 
 Examples:
 
- % echo '[1,5,10,2,4,6]' | chart -t sparkline
+ % echo '[1,5,10,2,4,6]' | tchart -t sparkline
 
- % chart -t sparkline 1 5 10 2 4 6
+ % tchart -t sparkline 1 5 10 2 4 6
 
  % cat celine-dion-album-sales.json
  [
@@ -183,7 +183,7 @@ Examples:
    ...
  ]
 
- % chart -l year -d sales celine-dion-album-sales.json
+ % tchart -l year -d sales celine-dion-album-sales.json
  1990|**                                            ( 3000000)
  1992|******                                        ( 5300000)
  1993|**********************                        (16600000)
@@ -232,7 +232,8 @@ Pick output chart format. Available formats: text, dump. Default is text.
 
 =item * --type, -t
 
-Pick chart type. Available type: C<line>, C<bar>. Default is C<bar>.
+Pick chart type. Available type: C<line>, C<bar>, C<sparkline>. Default is
+C<bar>.
 
 =back
 

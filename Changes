@@ -1,5 +1,13 @@
 Revision history for App-tchart
 
+0.04     2015-06-14 (PERLANCAR)
+
+         - No functional changes.
+
+         - Rename module/dist/app from App::chart/chart to App::tchart due to
+           conflict with preexisting CPAN module App::Chart/chart.
+
+
 0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
 
          [INCOMPATIBLE CHANGES]
