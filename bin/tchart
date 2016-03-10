@@ -98,9 +98,9 @@ sub get_input {
             push @$Data, { map { $colnames[$_] => $row->[$_]} 0..@$row-1 };
         }
     } elsif ($fmt eq 'json') {
-        require JSON;
+        require JSON::MaybeXS;
         require Perinci::Result::Util;
-        $Data = JSON->new->allow_nonref->decode(join "", @lines);
+        $Data = JSON::MaybeXS->new->allow_nonref->decode(join "", @lines);
         $Data = $Data->[2] if Perinci::Result::Util::is_env_res($Data);
     } elsif ($fmt eq 'yaml') {
         require Perinci::Result::Util;
@@ -118,10 +118,10 @@ sub get_input {
 
 sub display_chart {
     if ($Opts{output} eq 'dump') {
-        require JSON;
+        require JSON::MaybeXS;
         require TableData::Object;
         my $tbl = TableData::Object->new($Data);
-        print JSON->new->pretty->encode($tbl->as_aohos);
+        print JSON::MaybeXS->new->pretty->encode($tbl->as_aohos);
     } else {
         require Text::Chart;
         binmode(STDOUT, ":utf8");
