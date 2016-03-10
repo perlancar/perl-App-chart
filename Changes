@@ -1,5 +1,10 @@
 Revision history for App-tchart
 
+0.05    2016-03-10 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
 0.04     2015-06-14 (PERLANCAR)
 
          - No functional changes.
