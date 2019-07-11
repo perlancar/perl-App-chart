@@ -1,9 +1,9 @@
-0.05    2016-03-10 (PERLANCAR)
+0.05    2016-03-10  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.04     2015-06-14 (PERLANCAR)
+0.04     2015-06-14  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -36,11 +36,11 @@
          - Other fixes.
 
 
-0.02    2014-04-17 (SHARYANTO)
+0.02    2014-04-17  Released-By: SHARYANTO
 
         - Detect enveloped result (see Rinci::function) and adjust accordingly.
 
 
-0.01    2014-04-10 (SHARYANTO)
+0.01    2014-04-10  Released-By: SHARYANTO
 
         - First release.
