@@ -11,7 +11,7 @@
            conflict with preexisting CPAN module App::Chart/chart.
 
 
-0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.03     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          [INCOMPATIBLE CHANGES]
 
@@ -44,3 +44,4 @@
 0.01    2014-04-10  Released-By: SHARYANTO
 
         - First release.
+
