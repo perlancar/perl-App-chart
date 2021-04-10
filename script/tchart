@@ -124,7 +124,7 @@ sub display_chart {
         print JSON::MaybeXS->new->pretty->encode($tbl->as_aohos);
     } else {
         require Text::Chart;
-        binmode(STDOUT, ":utf8");
+        binmode(STDOUT, ":encoding(utf8)");
         print Text::Chart::gen_text_chart(
             data         => $Data,
             type         => $Opts{type},

@@ -1,3 +1,8 @@
+0.060   2021-04-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Update dependency's new name {,Data::}TableData::Object.
+
+
 0.05    2016-03-10  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
@@ -44,4 +49,3 @@
 0.01    2014-04-10  Released-By: SHARYANTO
 
         - First release.
-
