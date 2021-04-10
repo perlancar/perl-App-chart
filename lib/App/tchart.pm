@@ -1,6 +1,8 @@
 package App::tchart;
 
+# AUTHORITY
 # DATE
+# DIST
 # VERSION
 
 1;

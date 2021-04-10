@@ -119,8 +119,8 @@ sub get_input {
 sub display_chart {
     if ($Opts{output} eq 'dump') {
         require JSON::MaybeXS;
-        require TableData::Object;
-        my $tbl = TableData::Object->new($Data);
+        require Data::TableData::Object;
+        my $tbl = Data::TableData::Object->new($Data);
         print JSON::MaybeXS->new->pretty->encode($tbl->as_aohos);
     } else {
         require Text::Chart;
